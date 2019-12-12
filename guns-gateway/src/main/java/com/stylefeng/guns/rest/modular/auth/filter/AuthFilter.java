@@ -6,6 +6,7 @@ import com.stylefeng.guns.rest.common.exception.BizExceptionEnum;
 import com.stylefeng.guns.rest.config.properties.JwtProperties;
 import com.stylefeng.guns.rest.modular.auth.util.JwtTokenUtil;
 import io.jsonwebtoken.JwtException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,31 @@ public class AuthFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
+
+        // 配置忽略列表
+        String ignoreUrl = jwtProperties.getIgnoreUrl();
+        if( !StringUtils.isEmpty(ignoreUrl) )
+        {
+            String[] ignoreUrls = ignoreUrl.split(",");
+            if(ignoreUrls.length!=0){
+                for (String str : ignoreUrls ) {
+                    if(request.getServletPath().equals(str)) {
+                        chain.doFilter(request, response);
+                        return;
+                    }
+                }
+            }
+        }
+
+        /*String ignoreUrl = jwtProperties.getIgnoreUrl();
+        String[] ignoreUrls = ignoreUrl.split(",");
+        for (int i;i<ignoreUrls.length;i++){
+            if(request.getServletPath().equals(ignoreUrls[i])){
+                chain.doFilter(request, response);
+                return;
+            }
+        }*/
+
         final String requestHeader = request.getHeader(jwtProperties.getHeader());
         String authToken = null;
         if (requestHeader != null && requestHeader.startsWith("Bearer ")) {
