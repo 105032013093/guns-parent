@@ -1,4 +1,4 @@
-package com.stylefeng.guns.api;
+package com.stylefeng.guns.api.user;
 
 public interface UserAPI {
 

@@ -2,9 +2,9 @@ package com.stylefeng.guns.rest.modular.user;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.stylefeng.guns.api.UserAPI;
-import com.stylefeng.guns.api.UserInfoMedel;
-import com.stylefeng.guns.api.UserModel;
+import com.stylefeng.guns.api.user.UserAPI;
+import com.stylefeng.guns.api.user.UserInfoMedel;
+import com.stylefeng.guns.api.user.UserModel;
 import com.stylefeng.guns.core.util.MD5Util;
 import com.stylefeng.guns.rest.common.persistence.dao.MoocUserTMapper;
 import com.stylefeng.guns.rest.common.persistence.model.MoocUserT;
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@Service(interfaceClass = UserAPI.class)
+@Service(interfaceClass = UserAPI.class,loadbalance = "roundrobin")
 public class UserServiceImpl implements UserAPI {
 
     @Autowired
