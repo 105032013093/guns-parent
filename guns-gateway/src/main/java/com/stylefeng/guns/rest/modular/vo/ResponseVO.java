@@ -1,5 +1,8 @@
 package com.stylefeng.guns.rest.modular.vo;
 
+import lombok.Data;
+
+@Data
 public class ResponseVO<M> {
 
     // 返回状态[[0|成功;1|业务失败;999|系统异常]
@@ -9,30 +12,18 @@ public class ResponseVO<M> {
     // 返回数据实体
     private M date;
 
+    // 图片前缀
+    private String imgPre;
+
     private ResponseVO(){}
 
-    public String getStatus() {
-        return status;
-    }
+    public static<M> ResponseVO  succees(M m,String imgPre){
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.setDate(m);
+        responseVO.setImgPre(imgPre);
+        responseVO.setStatus("0");
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public M getDate() {
-        return date;
-    }
-
-    public void setDate(M date) {
-        this.date = date;
+        return responseVO;
     }
 
     public static<M> ResponseVO  succees(M m){
