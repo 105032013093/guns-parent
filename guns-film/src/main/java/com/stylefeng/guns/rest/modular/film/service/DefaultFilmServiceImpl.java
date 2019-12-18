@@ -71,7 +71,7 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
     }
 
     @Override
-    public FilmVO getHotFilms(boolean isLimit, int nums) {
+    public FilmVO getHotFilms(boolean isLimit, int nums, int nowPage, int sortId, int catId, int sourceId, int yearId) {
         FilmVO filmVO = new FilmVO();
         List<FilmInfo> filmInfos = new ArrayList<>();
         // 限制为热映影片
@@ -89,12 +89,58 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
             filmVO.setFilmInfo(filmInfos);
         } else {
             // 如果不是为列表页
+            // Page<MoocFilmT> page = new Page<>(nowPage, nums);
+
+            Page<MoocFilmT> page = null;
+            // 根据sortId不同，来组织不同的Page对象
+            // 排序方式，1-按热门搜索，2-按时间搜索，3-按评价搜索
+            switch (sortId) {
+                case 1:
+                    page = new Page<>(nowPage, nums, "film_box_office");
+                    break;
+                case 2:
+                    page = new Page<>(nowPage, nums, "film_time");
+                    break;
+                case 3:
+                    page = new Page<>(nowPage, nums, "film_score");
+                    break;
+                default:
+                    page = new Page<>(nowPage, nums, "film_box_office");
+                    break;
+            }
+
+            if (catId != 99) {
+                String catStr = "%#" + catId + "#%";
+                entityWrapper.like("film_cats", catStr);
+            }
+            if (sourceId != 99) {
+                entityWrapper.eq("film_source", sourceId);
+            }
+            if (yearId != 99) {
+                entityWrapper.eq("film_date", yearId);
+            }
+
+            List<MoocFilmT> moocFilms = moocFilmTMapper.selectPage(page, entityWrapper);
+            // 组织filmInfos
+            filmInfos = getFileInfos(moocFilms);
+
+            filmVO.setFileNum(filmInfos.size());
+            filmVO.setFilmInfo(filmInfos);
+
+            // 获取总页数
+            int totalCounts = moocFilmTMapper.selectCount(entityWrapper);
+            int totalPages = (totalCounts / nums) + 1;
+            filmVO.setFileNum(totalPages);
+
+            filmVO.setNowPage(nowPage);
+            filmVO.setTotalPage(totalPages);
         }
         return filmVO;
     }
 
+
     @Override
-    public FilmVO getSoonFilms(boolean isLimit, int nums) {
+    public FilmVO getSoonFilms(boolean isLimit, int nums, int nowPage, int sortId, int catId, int sourceId, int yearId) {
         FilmVO filmVO = new FilmVO();
         List<FilmInfo> filmInfos = new ArrayList<>();
         // 限制为即将上映影片
@@ -112,7 +158,109 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
             filmVO.setFilmInfo(filmInfos);
         } else {
             // 如果不是为列表页
+            // Page<MoocFilmT> page = new Page<>(nowPage, nums);
+
+            Page<MoocFilmT> page = null;
+            // 根据sortId不同，来组织不同的Page对象
+            // 排序方式，1-按热门搜索，2-按时间搜索，3-按评价搜索
+            switch (sortId) {
+                case 1:
+                    page = new Page<>(nowPage, nums, "film_preSaleNum");
+                    break;
+                case 2:
+                    page = new Page<>(nowPage, nums, "film_time");
+                    break;
+                case 3:
+                    page = new Page<>(nowPage, nums, "film_preSaleNum");
+                    break;
+                default:
+                    page = new Page<>(nowPage, nums, "film_preSaleNum");
+                    break;
+            }
+
+            if (catId != 99) {
+                String catStr = "%#" + catId + "#%";
+                entityWrapper.like("film_cats", catStr);
+            }
+            if (sourceId != 99) {
+                entityWrapper.eq("film_source", sourceId);
+            }
+            if (yearId != 99) {
+                entityWrapper.eq("film_date", yearId);
+            }
+
+            List<MoocFilmT> moocFilms = moocFilmTMapper.selectPage(page, entityWrapper);
+            // 组织filmInfos
+            filmInfos = getFileInfos(moocFilms);
+
+            filmVO.setFileNum(filmInfos.size());
+            filmVO.setFilmInfo(filmInfos);
+
+            // 获取总页数
+            int totalCounts = moocFilmTMapper.selectCount(entityWrapper);
+            int totalPages = (totalCounts / nums) + 1;
+            filmVO.setFileNum(totalPages);
+
+            filmVO.setNowPage(nowPage);
+            filmVO.setTotalPage(totalPages);
         }
+        return filmVO;
+    }
+
+    @Override
+    public FilmVO getClassicFilms(int nums, int nowPage, int sortId, int catId, int sourceId, int yearId) {
+        FilmVO filmVO = new FilmVO();
+        List<FilmInfo> filmInfos = new ArrayList<>();
+        // 限制为经典影片
+        EntityWrapper<MoocFilmT> entityWrapper = new EntityWrapper<>();
+        entityWrapper.eq("film_status", "3");
+
+        // Page<MoocFilmT> page = new Page<>(nowPage, nums);
+
+        Page<MoocFilmT> page = null;
+        // 根据sortId不同，来组织不同的Page对象
+        // 排序方式，1-按热门搜索，2-按时间搜索，3-按评价搜索
+        switch (sortId) {
+            case 1:
+                page = new Page<>(nowPage, nums, "film_box_office");
+                break;
+            case 2:
+                page = new Page<>(nowPage, nums, "film_time");
+                break;
+            case 3:
+                page = new Page<>(nowPage, nums, "film_score");
+                break;
+            default:
+                page = new Page<>(nowPage, nums, "film_box_office");
+                break;
+        }
+
+        if (catId != 99) {
+            String catStr = "%#" + catId + "#%";
+            entityWrapper.like("film_cats", catStr);
+        }
+        if (sourceId != 99) {
+            entityWrapper.eq("film_source", sourceId);
+        }
+        if (yearId != 99) {
+            entityWrapper.eq("film_date", yearId);
+        }
+
+        List<MoocFilmT> moocFilms = moocFilmTMapper.selectPage(page, entityWrapper);
+        // 组织filmInfos
+        filmInfos = getFileInfos(moocFilms);
+
+        filmVO.setFileNum(filmInfos.size());
+        filmVO.setFilmInfo(filmInfos);
+
+        // 获取总页数
+        int totalCounts = moocFilmTMapper.selectCount(entityWrapper);
+        int totalPages = (totalCounts / nums) + 1;
+        filmVO.setFileNum(totalPages);
+
+        filmVO.setNowPage(nowPage);
+        filmVO.setTotalPage(totalPages);
+
         return filmVO;
     }
 
@@ -129,7 +277,7 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
         filmInfos = getFileInfos(moocFilms);
 
         return filmInfos;
-}
+    }
 
     @Override
     public List<FilmInfo> getExpectRanking() {
@@ -166,10 +314,10 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
         List<CatVO> cats = new ArrayList<>();
         // 查询实体对象
         List<MoocCatDictT> moocCats = moocCatDictTMapper.selectList(null);
-        for(MoocCatDictT moocCatDictT : moocCats) {
+        for (MoocCatDictT moocCatDictT : moocCats) {
             CatVO catVO = new CatVO();
             // 转化为业务对象
-            catVO.setCatId(moocCatDictT.getUuid()+"");
+            catVO.setCatId(moocCatDictT.getUuid() + "");
             catVO.setCatName(moocCatDictT.getShowName());
 
             cats.add(catVO);
@@ -183,10 +331,10 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
         List<SourceVO> Sources = new ArrayList<>();
         // 查询实体对象
         List<MoocSourceDictT> moocSources = moocSourceDictTMapper.selectList(null);
-        for(MoocSourceDictT moocSourceDictT : moocSources) {
+        for (MoocSourceDictT moocSourceDictT : moocSources) {
             SourceVO sourceVO = new SourceVO();
             // 转化为业务对象
-            sourceVO.setSourceId(moocSourceDictT.getUuid()+"");
+            sourceVO.setSourceId(moocSourceDictT.getUuid() + "");
             sourceVO.setSourceName(moocSourceDictT.getShowName());
 
             Sources.add(sourceVO);
@@ -200,10 +348,10 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
         List<YearVO> years = new ArrayList<>();
         // 查询实体对象
         List<MoocYearDictT> moocYears = moocYearDictTMapper.selectList(null);
-        for(MoocYearDictT moocYearDictT : moocYears) {
+        for (MoocYearDictT moocYearDictT : moocYears) {
             YearVO yearVO = new YearVO();
             // 转化为业务对象
-            yearVO.setYearId(moocYearDictT.getUuid()+"");
+            yearVO.setYearId(moocYearDictT.getUuid() + "");
             yearVO.setYearName(moocYearDictT.getShowName());
 
             years.add(yearVO);
