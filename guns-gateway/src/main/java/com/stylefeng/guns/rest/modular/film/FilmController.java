@@ -8,10 +8,7 @@ import com.stylefeng.guns.rest.modular.film.vo.FilmConditionVO;
 import com.stylefeng.guns.rest.modular.film.vo.FilmIndexVO;
 import com.stylefeng.guns.rest.modular.film.vo.FilmRequestVO;
 import com.stylefeng.guns.rest.modular.vo.ResponseVO;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,5 +134,43 @@ public class FilmController {
         }
 
         return ResponseVO.succees(filmVO.getFilmInfo(), IMG_PRE, filmVO.getNowPage(), filmVO.getTotalPage());
+    }
+
+    @RequestMapping(value = "films/{searchParam}", method = RequestMethod.GET)
+    public ResponseVO getFilms(@PathVariable("searchParam") String searchParam,
+                               int searchType) {
+
+        // 根据searchType判断查询类型
+        FilmDetailVO filmDetail = filmServiceAPI.getFilmDetail(searchType, searchParam);
+        // 查询影片详细信息
+        String filmId = filmDetail.getFilmId();
+
+        FilmDescVO filmDescVO = filmServiceAPI.getFilmDesc(filmId);
+
+        ImgVO imgVO = filmServiceAPI.getImg(filmId);
+
+        InfoRequestVO infoRequestVO = new InfoRequestVO();
+        // 组织演员信息
+        ActorRequestVO actorRequestVO = new ActorRequestVO();
+        // 导演
+        ActorVO dictActor = filmServiceAPI.getDictActor(filmId);
+        // 演员
+        List<ActorVO> actors = filmServiceAPI.getActors(filmId);
+        // 设置演员属性
+        actorRequestVO.setActors(actors);
+        // 设置导演属性
+        actorRequestVO.setDirector(dictActor);
+        infoRequestVO.setActors(actorRequestVO);
+
+        infoRequestVO.setBiography(filmDescVO.getBiography());
+
+        infoRequestVO.setImgVO(imgVO);
+
+        infoRequestVO.setFilmId(filmId);
+
+        filmDetail.setInfo04(infoRequestVO);
+
+
+        return ResponseVO.succees(filmDetail, IMG_PRE);
     }
 }

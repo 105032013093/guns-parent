@@ -28,6 +28,10 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
     private MoocSourceDictTMapper moocSourceDictTMapper;
     @Autowired
     private MoocYearDictTMapper moocYearDictTMapper;
+    @Autowired
+    private MoocFilmInfoTMapper moocFilmInfoTMapper;
+    @Autowired
+    private MoocActorTMapper moocActorTMapper;
 
 
     @Override
@@ -309,6 +313,69 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
         return filmInfos;
     }
 
+    private MoocFilmInfoT getFilmInfo(String filmId) {
+        MoocFilmInfoT moocFilmInfoT = new MoocFilmInfoT();
+        moocFilmInfoT.setFilmId(filmId);
+        moocFilmInfoT = moocFilmInfoTMapper.selectOne(moocFilmInfoT);
+        return moocFilmInfoT;
+
+    }
+
+    @Override
+    public FilmDescVO getFilmDesc(String filmId) {
+        MoocFilmInfoT moocFilmInfoT = getFilmInfo(filmId);
+
+        FilmDescVO filmDescVO = new FilmDescVO();
+        filmDescVO.setBiography(moocFilmInfoT.getBiography());
+        filmDescVO.setFilmId(moocFilmInfoT.getFilmId());
+
+        return filmDescVO;
+    }
+
+    @Override
+    public ImgVO getImg(String filmId) {
+        MoocFilmInfoT moocFilmInfoT = getFilmInfo(filmId);
+
+        String filmImgStr = moocFilmInfoT.getFilmImgs();
+
+        String[] filmImgs = filmImgStr.split(",");
+
+        ImgVO imgVO = new ImgVO();
+
+        if (filmImgs.length == 5) {
+            imgVO.setMainImg(filmImgs[0]);
+            imgVO.setImg01(filmImgs[1]);
+            imgVO.setImg02(filmImgs[2]);
+            imgVO.setImg03(filmImgs[3]);
+            imgVO.setImg04(filmImgs[4]);
+        }
+        return imgVO;
+    }
+
+    @Override
+    public ActorVO getDictActor(String filmId) {
+        MoocFilmInfoT moocFilmInfoT = getFilmInfo(filmId);
+        Integer directorId = moocFilmInfoT.getDirectorId();
+
+        MoocActorT moocActorT = moocActorTMapper.selectById(directorId);
+
+        ActorVO actorVO = new ActorVO();
+
+        actorVO.setDirectorName(moocActorT.getActorName());
+        actorVO.setImgAddress(moocActorT.getActorImg());
+        actorVO.setImgAddress(moocActorT.getActorImg());
+
+
+        return actorVO;
+    }
+
+    @Override
+    public List<ActorVO> getActors(String filmId) {
+        List<ActorVO> actors = moocActorTMapper.getActors(filmId);
+
+        return actors;
+    }
+
     @Override
     public List<CatVO> getCats() {
         List<CatVO> cats = new ArrayList<>();
@@ -358,5 +425,17 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
         }
 
         return years;
+    }
+
+    @Override
+    public FilmDetailVO getFilmDetail(int searchType, String searchParam) {
+        FilmDetailVO filmDetailVO = null;
+        // 判断searchType 1|按照名称;2|按照ID
+        if (searchType == 1) {
+            filmDetailVO = moocFilmTMapper.getFilmDetailByName(searchParam);
+        } else {
+            filmDetailVO = moocFilmTMapper.getFilmDetailById(searchParam);
+        }
+        return filmDetailVO;
     }
 }
