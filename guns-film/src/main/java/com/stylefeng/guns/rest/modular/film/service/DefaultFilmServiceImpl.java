@@ -432,7 +432,7 @@ public class DefaultFilmServiceImpl implements FilmServiceAPI {
         FilmDetailVO filmDetailVO = null;
         // 判断searchType 1|按照名称;2|按照ID
         if (searchType == 1) {
-            filmDetailVO = moocFilmTMapper.getFilmDetailByName(searchParam);
+            filmDetailVO = moocFilmTMapper.getFilmDetailByName("%" + searchParam + "%");
         } else {
             filmDetailVO = moocFilmTMapper.getFilmDetailById(searchParam);
         }
