@@ -8,5 +8,5 @@ import java.io.Serializable;
 public class AreaVO implements Serializable {
     private String areaId;
     private String areaName;
-    private String isActive;
+    private boolean isActive;
 }
