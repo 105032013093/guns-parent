@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.stylefeng.guns.api.cinema.CinemaServiceAPI;
 import com.stylefeng.guns.api.cinema.vo.*;
 import com.stylefeng.guns.rest.common.persistence.dao.*;
-import com.stylefeng.guns.rest.common.persistence.model.MoocAreaDictT;
-import com.stylefeng.guns.rest.common.persistence.model.MoocBrandDictT;
-import com.stylefeng.guns.rest.common.persistence.model.MoocCinemaT;
-import com.stylefeng.guns.rest.common.persistence.model.MoocHallDictT;
+import com.stylefeng.guns.rest.common.persistence.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@Service(interfaceClass = CinemaServiceAPI.class)
+@Service(interfaceClass = CinemaServiceAPI.class, executes = 10)
 public class DefaultCinemaServiceImpl implements CinemaServiceAPI {
 
     @Autowired
@@ -202,19 +199,35 @@ public class DefaultCinemaServiceImpl implements CinemaServiceAPI {
 
     //6、获取所有电影的信息和对应的放映场次信息，根据影院编号
     @Override
-    public FilmInfoVO getFilmInfoByCinemaId(int CinemaId) {
-        return null;
+    public List<FilmInfoVO> getFilmInfoByCinemaId(int cinemaId) {
+        List<FilmInfoVO> filmInfos = moocFieldTMapper.getFilmInfos(cinemaId);
+        return filmInfos;
     }
 
     //7、根据放映场次ID获取放映信息
     @Override
-    public FilmFieldVO getFilmFieldInfo(int fieldId) {
-        return null;
+    public HallInfoVO getFilmFieldInfo(int fieldId) {
+
+        HallInfoVO hallInfo = moocFieldTMapper.getHallInfo(fieldId);
+        return hallInfo;
     }
 
     //8、根据放映场次查询播放的电影编号，然后根据电影编号获取对应的电影信息
     @Override
     public FilmInfoVO getFilmInfoByFieldId(int fieldId) {
-        return null;
+
+        FilmInfoVO filmInfo = moocFieldTMapper.getFilmInfoById(fieldId);
+
+        return filmInfo;
+    }
+
+    @Override
+    public OrderQueryVO getOrderNeeds(int fileId) {
+        OrderQueryVO orderQueryVO = new OrderQueryVO();
+        MoocFieldT moocFieldT = moocFieldTMapper.selectById(fileId);
+        orderQueryVO.setCinemaId(moocFieldT.getCinemaId() + "");
+        orderQueryVO.setFilmPrice(moocFieldT.getPrice() + "");
+
+        return orderQueryVO;
     }
 }
