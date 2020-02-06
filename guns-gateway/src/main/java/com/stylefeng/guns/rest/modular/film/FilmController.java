@@ -25,11 +25,11 @@ public class FilmController {
 
     public static final int DEFAULT_NUM = 99;
 
-    @Reference(interfaceClass = FilmServiceAPI.class)
+    @Reference(interfaceClass = FilmServiceAPI.class, check = false)
     private FilmServiceAPI filmServiceAPI;
 
     // 异步调用API
-    @Reference(interfaceClass = FilmAsyncServiceAPI.class, async = true)
+    @Reference(interfaceClass = FilmAsyncServiceAPI.class, async = true, check = false)
     private FilmAsyncServiceAPI filmAsyncServiceAPI;
 
     /**
